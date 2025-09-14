@@ -14,6 +14,16 @@ Rails.application.routes.draw do
           delete :unfollow
         end
       end
+
+      # Sleep Records System
+      # POST /api/v1/sleep_records/clock_in - Clock in for sleep
+      # POST /api/v1/sleep_records/clock_out - Clock out from sleep
+      resources :sleep_records, only: [] do
+        collection do
+          post :clock_in
+          post :clock_out
+        end
+      end
     end
   end
 end

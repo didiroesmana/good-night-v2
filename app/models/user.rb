@@ -5,6 +5,9 @@ class User < ApplicationRecord
   has_many :following, through: :following_relationships, source: :followed
   has_many :followers, through: :follower_relationships, source: :follower
 
+  # Sleep records relationship
+  has_many :sleep_records, dependent: :destroy
+
   # Validations
   validates :name, presence: true, length: { maximum: 100 }
 
