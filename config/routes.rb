@@ -1,10 +1,19 @@
 Rails.application.routes.draw do
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  # Health check endpoint for load balancers and uptime monitors
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # Sleep Tracker API Routes
+  namespace :api do
+    namespace :v1 do
+      # User Following System
+      # POST /api/v1/users/:user_id/follow - Follow a user
+      # DELETE /api/v1/users/:user_id/unfollow - Unfollow a user
+      resources :users, only: [] do
+        member do
+          post :follow
+          delete :unfollow
+        end
+      end
+    end
+  end
 end
