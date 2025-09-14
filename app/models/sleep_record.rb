@@ -8,8 +8,10 @@ class SleepRecord < ApplicationRecord
   validate :minimum_sleep_duration, if: -> { sleep_time.present? && wake_time.present? }
 
   scope :latest_active, -> { where(wake_time: nil).order(sleep_time: :desc).limit(1) }
+  scope :completed, -> { where.not(wake_time: nil) }
 
   before_save :calculate_sleep_length, if: -> { sleep_time.present? && wake_time.present? }
+  after_update :enqueue_daily_summary_job, if: -> { saved_change_to_wake_time? && completed? }
 
   def active?
     wake_time.nil?
@@ -34,5 +36,9 @@ class SleepRecord < ApplicationRecord
 
   private def calculate_sleep_length
     self.sleep_length_in_minutes = ((wake_time - sleep_time) / 1.minute).round
+  end
+
+  private def enqueue_daily_summary_job
+    PopulateDailySleepSummaryJob.perform_later(user_id, self.id)
   end
 end

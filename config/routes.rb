@@ -22,6 +22,7 @@ Rails.application.routes.draw do
         collection do
           post :clock_in
           post :clock_out
+          get :friends_activity
         end
       end
     end

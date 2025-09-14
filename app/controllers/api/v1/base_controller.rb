@@ -23,9 +23,10 @@ class Api::V1::BaseController < ApplicationController
   end
 
   # Standardized success response format
-  protected def render_success(data: {}, status: :ok)
+  protected def render_success(data: {}, metadata:{}, status: :ok)
     render json: {
       data: data,
+      metadata: metadata,
     }, status: status
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_14_080841) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_14_131107) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -20,6 +20,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_14_080841) do
     t.integer "total_sleep_length_in_minutes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id", "date", "total_sleep_length_in_minutes"], name: "index_sleep_summaries_user_date_length", order: { total_sleep_length_in_minutes: :desc }
     t.index ["user_id", "date"], name: "index_daily_sleep_summaries_on_user_id_and_date", unique: true
     t.index ["user_id"], name: "index_daily_sleep_summaries_on_user_id"
   end
@@ -31,6 +32,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_14_080841) do
     t.integer "sleep_length_in_minutes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["user_id", "sleep_time"], name: "idx_sleep_user_day_closed", where: "(wake_time IS NOT NULL)"
     t.index ["user_id", "sleep_time"], name: "index_sleep_records_on_user_id_and_sleep_time", unique: true
     t.index ["user_id", "sleep_time"], name: "index_sleep_records_on_user_id_and_sleep_time_desc_open", order: { sleep_time: :desc }, where: "(wake_time IS NULL)"
     t.index ["user_id"], name: "index_sleep_records_on_user_id"
