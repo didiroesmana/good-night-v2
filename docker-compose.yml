@@ -1,0 +1,84 @@
+services:
+  db:
+    image: postgres:17-trixie
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: good_night_v2
+      POSTGRES_DB: good_night_v2_development
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+     - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U good_night_v2"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  web:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails server -b 0.0.0.0"
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
+    ports:
+      - "3000:3000"
+    depends_on:
+      dev-migration:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://good_night_v2:password@db:5432/good_night_v2_development
+      RAILS_ENV: development
+
+  dev-migration:
+    build: .
+    command: bundle exec rake db:prepare db:migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://good_night_v2:password@db:5432/good_night_v2_development
+      RAILS_ENV: development
+
+  worker:
+    build: .
+    command: bundle exec rails solid_queue:start
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://good_night_v2:password@db:5432/good_night_v2_development
+      RAILS_ENV: development
+  
+  test-migration:
+    build: .
+    command: bin/rake db:prepare db:migrate
+    depends_on:
+      test-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgres://good_night_v2:password@test-db:5432/good_night_v2_test"
+      RAILS_ENV: test
+
+  test-db:
+    image: postgres:17-trixie
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: good_night_v2
+      POSTGRES_DB: good_night_v2_test
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U good_night_v2 -d good_night_v2_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  postgres_data:
+  bundle_cache:

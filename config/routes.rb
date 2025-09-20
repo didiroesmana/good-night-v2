@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       # Sleep Records System
       # POST /api/v1/sleep_records/clock_in - Clock in for sleep
       # POST /api/v1/sleep_records/clock_out - Clock out from sleep
+      # GET /api/v1/sleep_records/friends_activity - See the sleep records of a user's All following users' sleep records
       resources :sleep_records, only: [] do
         collection do
           post :clock_in
