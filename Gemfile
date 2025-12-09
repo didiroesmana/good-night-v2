@@ -39,7 +39,7 @@ gem "thruster", require: false
 # gem "rack-cors"
 # 
 
-gem 'active_model_serializers', '~> 0.10.0'
+gem 'active_model_serializers', '~> 0.10.16'
 gem 'kaminari'
 
 group :development, :test do
